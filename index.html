@@ -1,0 +1,61 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>محاسبه زمان توقف تولید</title>
+  <link rel="manifest" href="manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</head>
+<body>
+  <h2>محاسبه زمان توقف تولید</h2>
+  <label>🕒 ساعت شروع:</label><br>
+  <input type="number" id="startHour" placeholder="ساعت (مثلاً 7)">
+  <input type="number" id="startMinute" placeholder="دقیقه (مثلاً 30)"><br>
+
+  <label>🕔 ساعت پایان:</label><br>
+  <input type="number" id="endHour" placeholder="ساعت (مثلاً 12)">
+  <input type="number" id="endMinute" placeholder="دقیقه (مثلاً 15)"><br>
+
+  <label>⏱ زمان ضرب (ثانیه):</label><br>
+  <input type="number" id="cycleTime" placeholder="مثلاً 30"><br>
+
+  <label>🔢 تعداد ضرب زده شده:</label><br>
+  <input type="number" id="produced" placeholder="مثلاً 500"><br>
+
+  <button onclick="calculateDowntime()">محاسبه</button>
+  <div class="result" id="result"></div>
+
+  <script>
+    function calculateDowntime() {
+      const startHour = parseInt(document.getElementById('startHour').value);
+      const startMinute = parseInt(document.getElementById('startMinute').value);
+      const endHour = parseInt(document.getElementById('endHour').value);
+      const endMinute = parseInt(document.getElementById('endMinute').value);
+      const cycleTime = parseFloat(document.getElementById('cycleTime').value);
+      const produced = parseInt(document.getElementById('produced').value);
+
+      const startTotalMin = startHour * 60 + startMinute;
+      const endTotalMin = endHour * 60 + endMinute;
+      const totalWorkTimeSec = (endTotalMin - startTotalMin) * 60;
+
+      const expectedProduction = Math.floor(totalWorkTimeSec / cycleTime);
+      const missed = expectedProduction - produced;
+
+      let resultText = '';
+      if (missed <= 0) {
+        resultText = '✅ هیچ توقفی نداشتید!';
+      } else {
+        const downtimeMin = (missed * cycleTime) / 60;
+        resultText = `⏳ زمان توقف: ${downtimeMin.toFixed(2)} دقیقه`;
+      }
+
+      document.getElementById('result').innerText = resultText;
+    }
+  </script>
+</body>
+</html>
